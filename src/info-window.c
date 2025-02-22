@@ -40,8 +40,6 @@ gboolean on_info_window_destroy(GtkWidget * widget, gpointer data) {
   (void)widget;
   InfoWindowData * info_window_data = (InfoWindowData * ) data;
 
-
-  
  if(check_distro_from_window_data(info_window_data) == DEBIAN) {
   debian_info_open = FALSE;
   return TRUE;
@@ -49,8 +47,6 @@ gboolean on_info_window_destroy(GtkWidget * widget, gpointer data) {
   fedora_info_open = FALSE;
   return TRUE;
   } else { return FALSE; }
-
-
 }
 
 enum Distro check_distro_from_window_data(gpointer data) {
@@ -103,6 +99,7 @@ GtkWidget * make_notebook(gpointer data) {
   }
 }
 
+
 gboolean init_info_gui(gpointer data) {
       InfoWindowData * info_window_data = (InfoWindowData *) data;
 
@@ -125,8 +122,6 @@ gboolean init_info_gui(gpointer data) {
       g_signal_connect(info_window, "destroy", G_CALLBACK(on_info_window_destroy), info_window_data);
       gtk_widget_set_visible(info_window, TRUE);
       
-      ///////////////////////
-      
        if (gtk_widget_is_visible(info_window)) {
     g_print("info_window created.  \n");
 
@@ -138,10 +133,7 @@ gboolean init_info_gui(gpointer data) {
 
     return FALSE;
   }
-      
-      //////////////////////
-    
-  } 
+} 
 
 
 void create_notebook_tab(GtkWidget * notebook, gchar * view_css_label, gchar * tab_label, gchar * tab_css_label, gchar * res_path1, gchar * res_path2) {
@@ -180,13 +172,13 @@ void create_notebook_tab(GtkWidget * notebook, gchar * view_css_label, gchar * t
   if (g_file_get_contents(res_path1, &tab_text, &length, &error)) {
     gtk_text_buffer_set_text(buffer, tab_text, -1);
     g_free(tab_text);
-    g_free(error);
+    g_error_free(error);
 
   } else if (g_file_get_contents(res_path2, &tab_text, &length, &error)) {
 
     gtk_text_buffer_set_text(buffer, tab_text, -1);
     g_free(tab_text);
-    g_free(error);
+    g_error_free(error);
 
   } else {
     g_print("Failed to load info file: %s\n", error -> message);
@@ -203,6 +195,7 @@ void create_notebook_tab(GtkWidget * notebook, gchar * view_css_label, gchar * t
   gtk_notebook_append_page(GTK_NOTEBOOK(notebook), scroll_info_window, tab_label_view);
 
 }
+
 
 void make_info_window(GtkWidget * widget, gpointer data) {
   if (widget != NULL) {
@@ -261,9 +254,6 @@ void make_info_window(GtkWidget * widget, gpointer data) {
 
     }
 
-//--------------------------------------------------------------------------------------------------------------
-
-   // --------------------------------------------------------------------------------------------------------------
  } else { g_print("\nWindow is NULL\n\n"); }
 
 }

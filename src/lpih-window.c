@@ -190,7 +190,6 @@ enum Distro get_distro_from_parent_title(GtkWidget * widget) {
 }
 
 
-
 gboolean check_box_state(GtkWidget * checkbox, gpointer data) {
 
   GtkTextBuffer * buffer = GTK_TEXT_BUFFER(data);

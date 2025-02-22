@@ -35,58 +35,49 @@
 // This file contains functions outside of the realm of window generation.  You will find in here the functions to get the checkbox handling function, the functions to identify the CPU and GPU vendors, and the css initializer function.
 
 void set_cpu_vendor(void) {
+    gchar vendor[13];  // 12 chars + null terminator
+    get_cpu_vendor(vendor);
 
-  gpointer cpu_vendor_name = NULL;
-  gchar vendor[15];
-  get_cpu_vendor(vendor);
-  cpu_vendor_name = g_malloc(15);
+    enum vendor_name cpu_vendor;
 
-  if (strstr(vendor, "AMD") != NULL) {
-    *(enum vendor_name * ) cpu_vendor_name = AMD;
+    if (strstr(vendor, "AMD") != NULL) {
+        cpu_vendor = AMD;
+    } else if (strstr(vendor, "Intel") != NULL) {
+        cpu_vendor = Intel;
+    } else {
+        g_print("***** ERROR: The CPU vendor could not be determined for this computer. *****\n");
+        g_print("********************************************************************************\n\n");
+        cpu_vendor = Unknown;
+    }
 
-  } else if (strstr(vendor, "Intel") != NULL) {
-    *(enum vendor_name * ) cpu_vendor_name = Intel;
+    g_print("The CPU vendor for this machine is %s.\n", vendor);
+    g_print("********************************************************************************\n\n");
 
-  } else {
-    g_print("*****ERROR: The CPU vendor could not be determined for this computer.\n");
-    g_print("*************************************\n\n");
-    *(enum vendor_name * ) cpu_vendor_name = Unknown;
-
-  }
-
-  g_print("The CPU vendor for this machine is %s.\n", vendor);
-  g_print("*************************************\n\n");
-
-  // Determine Debian microcode command
-  if ( * (enum vendor_name * ) cpu_vendor_name == AMD) {
-    debian_microcode_command = "  sudo apt install amd64-microcode;\n";
-  } else if ( * (enum vendor_name * ) cpu_vendor_name == Intel) {
-    debian_microcode_command = "  sudo apt install intel-microcode;\n";
-    g_print("Debian microcode command is: %s", debian_microcode_command);
-  } else {
-    g_print("*****ERROR: Something went wrong trying to get the CPU vendor_name.*****\n");
-  }
-
-  g_free(cpu_vendor_name);
+    // Determine Debian microcode command
+    if (cpu_vendor == AMD) {
+        debian_microcode_command = "  sudo apt install amd64-microcode;\n";
+    } else if (cpu_vendor == Intel) {
+        debian_microcode_command = "  sudo apt install intel-microcode;\n";
+        g_print("Debian microcode command is: %s", debian_microcode_command);
+    } else {
+        g_print("***** ERROR: Something went wrong trying to get the CPU vendor name. *****\n");
+    }
 }
 
-// Function that uses inline assembly to get the vendor string of the CPU
-// The vendor gchar array is declared at runtime and fed into this function in lpih-main.c.
-
-void get_cpu_vendor(gchar * vendor) {
-    // Use inline assembly to execute the "cpuid" instruction and get the CPU vendor.
-    unsigned int registers[4] = {0};
+// Function that uses inline assembly to get the vendor string of the CPU.
+void get_cpu_vendor(gchar *vendor) {
+    unsigned int registers[4];
 
     __asm__ volatile(
         "cpuid"
         : "=b"(registers[1]), // EBX
           "=d"(registers[2]), // EDX
           "=c"(registers[3])  // ECX
-        : "a"(registers[0])   // EAX = 0
+        : "a"(0)              // EAX = 0 (vendor string)
     );
 
     // Copy results to vendor array and NULL-terminate.
-    memcpy(vendor, &registers[1], 4); // Copy EBX
+    memcpy(vendor, &registers[1], 4);   // Copy EBX
     memcpy(vendor + 4, &registers[2], 4); // Copy EDX
     memcpy(vendor + 8, &registers[3], 4); // Copy ECX
     vendor[12] = '\0'; // Null-terminate
@@ -102,7 +93,6 @@ void set_gpu_vendor(void) {
   const gchar * fed_amd_gpu = "  sudo dnf install xorg-x11-drv-amdgpu vulkan-tools mesa-vulkan-drivers \n";
   const gchar * deb_amd_gpu = "  sudo apt install firmware-linux firmware-linux-nonfree libdrm-amdgpu1 xserver-xorg-video-amdgpu;\n";
   const gchar * deb_intel_gpu = "  # Intel GPU drivers should already be installed. \n";
-  //  gchar * fed_intel_gpu = "  # Intel GPU drivers should already be installed. \n";
 
   if (strstr(gpu_vendor, "NVIDIA") != NULL) {
 
