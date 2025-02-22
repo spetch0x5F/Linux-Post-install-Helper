@@ -134,7 +134,7 @@ gboolean init_css_provider() {
 
     // Handling CSS file being read from the directory it gets installed to with the .deb and .rpm packages:
   } else if (cssPathForAppInstalled) {
-    g_print("The CSS file was found in /usr/share/LPIH/css");
+    g_print("The CSS file was found in /usr/share/LPIH/css \n");
     cssFilePathDecided = cssPathForAppInstalled;
     fclose(cssFileForAppInstalled);
   } else {

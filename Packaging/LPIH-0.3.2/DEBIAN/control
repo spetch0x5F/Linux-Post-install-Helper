@@ -1,0 +1,7 @@
+Source: lpih
+Package: LPIH
+Version: 0.3.2
+Architecture: amd64
+Maintainer: Samuel Petch sam.petch.recall824@passinbox.com
+Build-Depends: libgtk-4-1, libglib2.0-0
+Description: Linux Post-install Helper
